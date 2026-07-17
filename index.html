@@ -824,6 +824,17 @@
             color: var(--muted);
         }
 
+        .search-hint {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin: -8px 0 16px;
+        }
+
+        .search-hint b {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
         .empty-state {
             border: 1.5px dashed var(--line);
             border-radius: 10px;
@@ -1724,7 +1735,7 @@
                                     <circle cx="12" cy="8" r="4" />
                                     <path d="M4.5 20.5c.7-4 3.8-6 7.5-6s6.8 2 7.5 6" />
                                 </svg></span>
-                            <span class="tc-txt"><b>Persona</b><span>Cédula o pasaporte · banca personas</span></span>
+                            <span class="tc-txt"><b>Persona</b><span>Banca de personas</span></span>
                             <span class="tc-radio" aria-hidden="true"></span>
                         </button>
                         <button type="button" class="type-card" data-tipo="juridico" role="radio" aria-checked="false">
@@ -1734,8 +1745,7 @@
                                     <path d="M4 21V5l8-2v18M12 21h8V9l-8-2" />
                                     <path d="M7 9h2M7 13h2M15 12h2M15 16h2" />
                                 </svg></span>
-                            <span class="tc-txt"><b>Empresa</b><span>RUC o RIF · administradores y
-                                    secundarios</span></span>
+                            <span class="tc-txt"><b>Empresa</b><span>Administradores y secundarios</span></span>
                             <span class="tc-radio" aria-hidden="true"></span>
                         </button>
                     </div>
@@ -1746,9 +1756,14 @@
                             <circle cx="10.5" cy="10.5" r="6.5" />
                             <path d="m20 20-4.8-4.8" />
                         </svg>
-                        <input type="text" id="search-input" value="8-812-1930" aria-label="Criterio de búsqueda">
+                        <input type="text" id="search-input" value="8-812-1930"
+                            placeholder="CIF, identificación, usuario, número de producto o nombre del cliente"
+                            aria-label="Criterio de búsqueda">
                         <button class="btn primary" type="button" id="btn-buscar">Buscar</button>
                     </div>
+                    <p class="search-hint">Criterios de búsqueda: <b>CIF</b> · <b>Identificación</b> · <b>Usuario</b> ·
+                        <b>Número de producto</b> · <b>Nombre del cliente</b>.
+                    </p>
 
                     <div class="empty-state" id="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -1756,8 +1771,8 @@
                             <circle cx="10.5" cy="10.5" r="6.5" />
                             <path d="m20 20-4.8-4.8" />
                         </svg>
-                        <p>Seleccioná el tipo de usuario, ingresá el criterio (documento, nombre, correo o teléfono) y
-                            presioná
+                        <p>Seleccioná el tipo de usuario, ingresá el criterio (CIF, identificación, usuario, número de
+                            producto o nombre del cliente) y presioná
                             <strong>Buscar</strong>. Los resultados aparecerán aquí.
                         </p>
                     </div>
@@ -1811,9 +1826,10 @@
                                     aria-selected="false">Contacto</button>
                                 <button type="button" role="tab" data-pane="p-seguridad"
                                     aria-selected="false">Seguridad</button>
-                                <button type="button" role="tab" data-pane="p-productos" aria-selected="false">Productos
-                                    y
-                                    límites</button>
+                                <button type="button" role="tab" data-pane="p-productos"
+                                    aria-selected="false">Productos</button>
+                                <button type="button" role="tab" data-pane="p-limites"
+                                    aria-selected="false">Límites</button>
                                 <button type="button" role="tab" data-pane="p-actividad"
                                     aria-selected="false">Actividad</button>
                                 <button type="button" role="tab" data-pane="p-empresa"
@@ -1879,18 +1895,27 @@
                             </div>
 
                             <div class="pane" id="p-productos" role="tabpanel">
-                                <h3>Productos asociados y límites</h3>
+                                <h3>Productos asociados</h3>
                                 <dl class="kv">
                                     <dt>Cuenta corriente</dt>
                                     <dd>····4521 · USD · Activa</dd>
                                     <dt>Tarjeta de crédito</dt>
                                     <dd>····8810 · USD · Activa</dd>
-                                    <dt>Límite transferencias</dt>
-                                    <dd>$25,000.00 / día <button class="btn sm" type="button">Modificar</button></dd>
                                 </dl>
                                 <p class="hu-note"><b>Cubre:</b> HU Consulta de productos · HU Consulta y gestión de
-                                    productos · HU-11
-                                    Consulta de límites · HU-12 Modificación de límites</p>
+                                    productos</p>
+                            </div>
+
+                            <div class="pane" id="p-limites" role="tabpanel">
+                                <h3>Límites del usuario</h3>
+                                <dl class="kv">
+                                    <dt>Límite transferencias</dt>
+                                    <dd>$25,000.00 / día <button class="btn sm" type="button">Modificar</button></dd>
+                                    <dt>Límite pagos de servicios</dt>
+                                    <dd>$5,000.00 / día <button class="btn sm" type="button">Modificar</button></dd>
+                                </dl>
+                                <p class="hu-note"><b>Cubre:</b> HU-11 Consulta de límites · HU-12 Modificación de
+                                    límites</p>
                             </div>
 
                             <div class="pane" id="p-actividad" role="tabpanel">
@@ -2358,7 +2383,8 @@
                         <strong>Guardar
                             cambios</strong> para aplicarlos al emulador. Las secciones del menú y los tabs se derivan
                         automáticamente
-                        de las HUs marcadas. Super Admin no aparece porque siempre tiene acceso completo.</p>
+                        de las HUs marcadas. Super Admin no aparece porque siempre tiene acceso completo.
+                    </p>
                 </div>
                 <button class="btn" type="button" id="matrix-close">Cerrar</button>
             </div>
@@ -2446,6 +2472,7 @@
 
         var tipoUsuario = 'persona';
         var fichaOrigen = 'directa'; // 'directa' (persona, 1 resultado) | 'lista' (jurídico)
+        var fichaTipo = 'persona';   // tipo del usuario mostrado en la ficha abierta
         var EJEMPLO_QUERY = { persona: '8-812-1930', juridico: 'pérez' };
         var PERSONA_UNICA = {
             init: 'MP', name: 'María Pérez',
@@ -2460,6 +2487,12 @@
             var status = document.getElementById('f-status');
             status.textContent = datos.status;
             status.classList.toggle('blocked', datos.blocked === true || datos.blocked === 'true');
+        }
+
+        // El tab «Empresas» solo existe en fichas de usuarios jurídicos
+        function aplicarTipoFicha() {
+            if (fichaTipo === 'juridico') return;
+            document.querySelectorAll('[data-pane="p-empresa"], #p-empresa').forEach(function (el) { el.hidden = true; });
         }
 
         function resetBusqueda() {
@@ -2486,9 +2519,11 @@
                 // Documento exacto → coincidencia única: directo a la ficha
                 setFicha(PERSONA_UNICA);
                 fichaOrigen = 'directa';
+                fichaTipo = 'persona';
                 volverBtn.textContent = '← Nueva búsqueda';
                 resultados.hidden = true;
                 ficha.hidden = false;
+                applyRole(currentRole);
             } else {
                 // Empresa → varias coincidencias: lista primero
                 resultados.hidden = false;
@@ -2500,9 +2535,11 @@
             row.addEventListener('click', function () {
                 setFicha(row.dataset);
                 fichaOrigen = 'lista';
+                fichaTipo = 'juridico';
                 volverBtn.textContent = '← Volver a resultados (2)';
                 resultados.hidden = true;
                 ficha.hidden = false;
+                applyRole(currentRole);
             });
         });
 
@@ -2632,6 +2669,8 @@
             'u-estado-grp': ['hu-bloqueo', 'hu-desbloqueo', 'hu-cancelacion'],
             'u-tab-contacto': ['hu-contacto-consulta', 'hu-act-correo', 'hu-act-telefono'],
             'u-tab-seguridad': ['hu-13', 'hu-14', 'hu-15', 'hu-token-eliminar', 'hu-16', 'hu-17'],
+            'u-tab-productos': ['hu-productos-consulta', 'hu-productos-gestion'],
+            'u-tab-limites': ['hu-11', 'hu-12'],
             'u-tab-actividad': ['hu-21', 'hu-23', 'hu-25', 'hu-26'],
             'u-tab-empresa': ['hu-multi-grupos', 'hu-multi-admin'],
             'b-tab-aprob': ['hu-18', 'hu-19', 'hu-20'],
@@ -2690,8 +2729,10 @@
             ['#p-seguridad .actions .btn:nth-child(3)', 'hu-token-eliminar'],
             ['#p-seguridad .actions .btn:nth-child(4)', 'hu-16'],
             ['#p-seguridad .actions .btn:nth-child(5)', 'hu-17'],
-            /* Ficha 360 — productos y actividad */
-            ['#p-productos .btn', 'hu-12'],
+            /* Ficha 360 — productos, límites y actividad */
+            ['[data-pane="p-productos"], #p-productos', 'u-tab-productos'],
+            ['[data-pane="p-limites"], #p-limites', 'u-tab-limites'],
+            ['#p-limites .btn', 'hu-12'],
             ['[data-pane="p-actividad"], #p-actividad', 'u-tab-actividad'],
             ['#p-actividad .btn', 'hu-26'],
             ['[data-pane="p-empresa"], #p-empresa', 'u-tab-empresa'],
@@ -2728,6 +2769,7 @@
                 var allowed = role === 'superadmin' || (eff[binding[1]] || []).indexOf(role) > -1;
                 document.querySelectorAll(binding[0]).forEach(function (el) { el.hidden = !allowed; });
             });
+            aplicarTipoFicha();
             document.getElementById('fab-label').textContent = ROLE_LABELS[role];
             document.getElementById('op-role').textContent = ROLE_LABELS[role];
 
