@@ -1,0 +1,2944 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estructura Base Backoffice</title>
+    <style>
+        /* Tokens del DS Mercantil (Prisma) — versión light única.
+     Fuente: assets/css/mercantil-ds.css del proyecto. */
+        :root,
+        :root[data-theme="dark"],
+        :root[data-theme="light"] {
+            --bg: #F8F8F8;
+            /* --c-bg */
+            --surface: #FFFFFF;
+            /* --c-white */
+            --surface-2: #F0F6FD;
+            /* --c-info-50 */
+            --ink: #333333;
+            /* --c-neutral-1000 */
+            --muted: #666666;
+            /* --c-neutral-700 / --c-mercantil-gray */
+            --line: #DEDEDE;
+            /* --c-neutral-200 */
+            --accent: #00338D;
+            /* --c-mercantil-blue */
+            --accent-ink: #FFFFFF;
+            --accent-soft: #E6EDF5;
+            /* --c-primary-50 */
+            --accent-light: #009FDA;
+            /* --c-mercantil-blue-light */
+            --ok: #367C39;
+            /* --c-success-800 */
+            --ok-soft: #EDF7EE;
+            /* --c-success-50 */
+            --warn: #995F11;
+            /* --c-warning-900 */
+            --warn-soft: #FAF1E6;
+            /* --c-warning-100 */
+            --err: #CF2626;
+            /* --c-error-700 */
+            --err-soft: #FFF0F0;
+            /* --c-error-100 */
+            --star: #FF5800;
+            /* --c-mercantil-orange */
+            --star-soft: #FFF1EB;
+            /* --c-tertiary-50 */
+            --shadow: 0 1px 2px rgba(0, 51, 141, .06), 0 8px 24px rgba(0, 51, 141, .07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            /* --font-family del DS */
+            font-size: 15px;
+            line-height: 1.5;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ---------- Topbar ---------- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--accent);
+            color: var(--accent-ink);
+            padding: 0 24px;
+            height: 56px;
+            flex: 0 0 auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .brand b {
+            font-size: 17px;
+            letter-spacing: .01em;
+        }
+
+        .brand span {
+            font-size: 12px;
+            opacity: .75;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .topbar .operator {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .operator .op-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* ---------- Shell ---------- */
+        .shell {
+            display: grid;
+            grid-template-columns: 264px 1fr;
+            flex: 1;
+            min-height: 0;
+        }
+
+        @media (max-width: 760px) {
+            .shell {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+        }
+
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--line);
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            font: inherit;
+            text-align: left;
+            color: var(--ink);
+            cursor: pointer;
+            background: none;
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .nav-item:hover {
+            background: var(--accent-soft);
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: var(--accent-ink);
+        }
+
+        .nav-item:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 2px;
+        }
+
+        .nav-item svg {
+            width: 19px;
+            height: 19px;
+            flex: 0 0 auto;
+            margin-top: 2px;
+        }
+
+        .nav-item .nav-txt {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .nav-item .nav-label {
+            font-weight: 600;
+            font-size: 14.5px;
+        }
+
+        .nav-item .nav-hu {
+            font-size: 11.5px;
+            color: var(--muted);
+        }
+
+        .nav-item.active .nav-hu {
+            color: var(--accent-ink);
+            opacity: .75;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            align-self: center;
+            flex: 0 0 auto;
+            font-size: 11.5px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            background: var(--star-soft);
+            color: var(--star);
+            border-radius: 999px;
+            padding: 2px 9px;
+        }
+
+        .nav-item.active .badge {
+            background: rgba(255, 255, 255, .22);
+            color: var(--accent-ink);
+        }
+
+        .sidebar-foot {
+            margin-top: auto;
+            padding: 12px;
+            font-size: 11.5px;
+            color: var(--muted);
+            border-top: 1px dashed var(--line);
+        }
+
+        /* ---------- Vistas ---------- */
+        .main {
+            padding: 28px 32px 48px;
+            min-width: 0;
+        }
+
+        .view {
+            display: none;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .view-head {
+            margin-bottom: 20px;
+        }
+
+        .view-head h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 4px;
+            letter-spacing: -.01em;
+        }
+
+        .view-head p {
+            color: var(--muted);
+            margin: 0;
+            font-size: 14px;
+            max-width: 72ch;
+        }
+
+        /* Cobertura de HUs */
+        details.cobertura {
+            background: var(--surface-2);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            margin: 14px 0 24px;
+            font-size: 13px;
+        }
+
+        details.cobertura summary {
+            cursor: pointer;
+            padding: 10px 14px;
+            font-weight: 600;
+            color: var(--accent);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        details.cobertura summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.cobertura summary::before {
+            content: "";
+            width: 0;
+            height: 0;
+            border-left: 5px solid var(--accent);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            transition: transform .15s ease;
+        }
+
+        details.cobertura[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        details.cobertura summary:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+        }
+
+        .hu-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 2px 14px 14px;
+        }
+
+        .hu-chip {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--ink);
+        }
+
+        .hu-chip b {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Tarjetas — paneles apilados a lo ancho, uno por subárea */
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 22px 26px;
+            min-width: 0;
+        }
+
+        .panel h2 {
+            font-size: 16.5px;
+            margin: 0 0 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel>p {
+            font-size: 13.5px;
+            color: var(--muted);
+            margin: 0 0 16px;
+        }
+
+        .hu-note {
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px dashed var(--line);
+            padding-top: 10px;
+        }
+
+        .hu-note b {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Filas de listas (bandejas, campañas, etc.) */
+        .rowlist {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 13px 18px;
+            font-size: 14px;
+        }
+
+        .row:hover {
+            border-color: var(--accent-light);
+        }
+
+        .row .r-main {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            gap: 1px;
+        }
+
+        .row .r-title {
+            font-weight: 600;
+        }
+
+        .row .r-sub {
+            font-size: 12.5px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .row .spacer {
+            margin-left: auto;
+        }
+
+        /* Pills de estado */
+        .pill {
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 999px;
+            flex: 0 0 auto;
+            background: var(--ok-soft);
+            color: var(--ok);
+        }
+
+        .pill.warn {
+            background: var(--warn-soft);
+            color: var(--warn);
+        }
+
+        .pill.err {
+            background: var(--err-soft);
+            color: var(--err);
+        }
+
+        .pill.info {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        /* Botones */
+        .btn {
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--accent-ink);
+        }
+
+        .btn.primary:hover {
+            color: var(--accent-ink);
+            opacity: .92;
+        }
+
+        .btn.sm {
+            font-size: 12px;
+            padding: 4px 10px;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 2px;
+        }
+
+        .btn:disabled {
+            opacity: .45;
+            cursor: default;
+        }
+
+        .btn:disabled:hover {
+            border-color: var(--line);
+            color: var(--ink);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* ---------- Vista Inicio ---------- */
+        .greet {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .greet h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 2px;
+            letter-spacing: -.01em;
+        }
+
+        .greet .g-date {
+            color: var(--muted);
+            font-size: 13.5px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .stat {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 16px 18px;
+        }
+
+        .stat .s-txt {
+            min-width: 0;
+        }
+
+        .stat .s-label {
+            font-size: 11.5px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-weight: 600;
+            display: block;
+        }
+
+        .stat .s-value {
+            font-size: 26px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            margin: 2px 0;
+            display: block;
+            line-height: 1.15;
+        }
+
+        .stat .s-hint {
+            font-size: 12px;
+            color: var(--muted);
+            display: block;
+        }
+
+        .s-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+        }
+
+        .s-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .s-icon.blue {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .s-icon.orange {
+            background: var(--star-soft);
+            color: var(--star);
+        }
+
+        .s-icon.green {
+            background: var(--ok-soft);
+            color: var(--ok);
+        }
+
+        .s-icon.cyan {
+            background: #E6F2F9;
+            color: #007CBF;
+        }
+
+        /* --c-secondary-50 / --c-secondary-700 */
+
+        .inicio-grid {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .inicio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .bar-row+.bar-row {
+            margin-top: 12px;
+        }
+
+        .bar-row .b-label {
+            flex: 0 0 44%;
+            min-width: 140px;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+
+        .bar-row .b-count {
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+            flex: 0 0 auto;
+        }
+
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .qa {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            font: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--ink);
+            text-align: left;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+        }
+
+        .qa:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .qa:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .qa .s-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+        }
+
+        .qa .s-icon svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        /* ---------- Vista Usuarios: tipo / buscador / resultados / ficha ---------- */
+        .type-cards {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            max-width: 680px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 560px) {
+            .type-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .type-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-align: left;
+            font: inherit;
+            color: var(--ink);
+            cursor: pointer;
+            background: var(--surface);
+            border: 1.5px solid var(--line);
+            border-radius: 10px;
+            padding: 14px 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .type-card:hover {
+            border-color: var(--accent-light);
+        }
+
+        .type-card:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .type-card .tc-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 9px;
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            background: var(--surface-2);
+            color: var(--muted);
+        }
+
+        .type-card .tc-icon svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .type-card .tc-txt {
+            min-width: 0;
+        }
+
+        .type-card .tc-txt b {
+            display: block;
+            font-size: 14.5px;
+        }
+
+        .type-card .tc-txt span {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .type-card .tc-radio {
+            margin-left: auto;
+            flex: 0 0 auto;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--line);
+            display: grid;
+            place-items: center;
+        }
+
+        .type-card.active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .type-card.active .tc-icon {
+            background: var(--accent);
+            color: var(--accent-ink);
+        }
+
+        .type-card.active .tc-radio {
+            border-color: var(--accent);
+        }
+
+        .type-card.active .tc-radio::after {
+            content: "";
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 8px 8px 14px;
+            background: var(--surface);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 180px;
+            border: 0;
+            outline: none;
+            font: inherit;
+            font-size: 14px;
+            color: var(--ink);
+            background: transparent;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--muted);
+        }
+
+        .empty-state {
+            border: 1.5px dashed var(--line);
+            border-radius: 10px;
+            padding: 52px 24px;
+            text-align: center;
+            color: var(--muted);
+            background: var(--surface);
+        }
+
+        .empty-state svg {
+            width: 36px;
+            height: 36px;
+            opacity: .45;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            margin: 0 auto;
+            font-size: 13.5px;
+            max-width: 48ch;
+        }
+
+        .chip {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 999px;
+            flex: 0 0 auto;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 0;
+            font-family: inherit;
+            cursor: default;
+        }
+
+        .chip.off {
+            background: var(--surface-2);
+            color: var(--muted);
+        }
+
+        .results-count {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 10px;
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .result {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            flex-wrap: wrap;
+            font: inherit;
+            font-size: 13.5px;
+            text-align: left;
+            color: var(--ink);
+            cursor: pointer;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .result:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .result:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .result .r-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .result .name {
+            font-weight: 700;
+            font-size: 14.5px;
+        }
+
+        .result .doc {
+            font-size: 12.5px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .result .chip {
+            margin-left: auto;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex: 0 0 auto;
+            background: var(--accent);
+            color: var(--accent-ink);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .back {
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            background: none;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            margin-bottom: 14px;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+
+        .back:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .ficha {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+        }
+
+        .user-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .user-head .name {
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        .user-head .doc {
+            font-size: 13px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .status {
+            margin-left: auto;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 999px;
+            background: var(--ok-soft);
+            color: var(--ok);
+            flex: 0 0 auto;
+        }
+
+        .status.blocked {
+            background: var(--warn-soft);
+            color: var(--warn);
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 18px;
+        }
+
+        .tabs button {
+            font: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--muted);
+            background: none;
+            border: 0;
+            border-bottom: 2px solid transparent;
+            padding: 9px 14px;
+            cursor: pointer;
+        }
+
+        .tabs button:hover {
+            color: var(--ink);
+        }
+
+        .tabs button.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tabs button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+        }
+
+        .pane {
+            display: none;
+        }
+
+        .pane.active {
+            display: block;
+        }
+
+        /* Contador dentro de un tab */
+        .tab-count {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-radius: 999px;
+            padding: 1px 8px;
+            font-size: 11.5px;
+            font-variant-numeric: tabular-nums;
+            margin-left: 4px;
+        }
+
+        .tabs button.active .tab-count {
+            background: var(--accent);
+            color: var(--accent-ink);
+        }
+
+        /* Barra de herramientas de una lista (búsqueda + filtros o acción principal) */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .toolbar .t-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 220px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--muted);
+            font-size: 13px;
+            background: var(--surface);
+        }
+
+        .toolbar .t-search svg {
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
+        }
+
+        /* Ocultamiento por permisos: debe ganar sobre .pane.active, .view.active, etc. */
+        [hidden] {
+            display: none !important;
+        }
+
+        /* Selector flotante de rol */
+        .role-switcher {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .fab {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font: inherit;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--accent-ink);
+            background: var(--accent);
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(0, 51, 141, .35);
+        }
+
+        .fab:hover {
+            opacity: .94;
+        }
+
+        .fab:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 2px;
+        }
+
+        .fab svg {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+        }
+
+        .fab .fab-kicker {
+            font-size: 10.5px;
+            font-weight: 600;
+            opacity: .75;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .role-panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 51, 141, .22);
+            padding: 14px;
+            width: 300px;
+            max-height: 62vh;
+            overflow: auto;
+        }
+
+        .rp-title {
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--muted);
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+
+        .rp-opt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            font: inherit;
+            font-size: 13.5px;
+            text-align: left;
+            color: var(--ink);
+            background: none;
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+        .rp-opt:hover {
+            background: var(--accent-soft);
+        }
+
+        .rp-opt:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+        }
+
+        .rp-opt.current {
+            background: var(--accent);
+            color: var(--accent-ink);
+            font-weight: 700;
+        }
+
+        .rp-opt .rp-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--line);
+            flex: 0 0 auto;
+        }
+
+        .rp-opt.current .rp-dot {
+            background: var(--star);
+        }
+
+        .op-role {
+            background: rgba(255, 255, 255, .16);
+            border: 1px solid rgba(255, 255, 255, .35);
+            border-radius: 999px;
+            padding: 2px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .rp-divider {
+            border-top: 1px solid var(--line);
+            margin: 8px 2px;
+        }
+
+        .rp-opt.rp-matrix {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .rp-opt.rp-matrix svg {
+            width: 15px;
+            height: 15px;
+            flex: 0 0 auto;
+        }
+
+        /* Matriz de permisos (overlay) */
+        .matrix-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(0, 31, 62, .5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .matrix-card {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 20, 50, .35);
+            width: min(1180px, 100%);
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .matrix-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .matrix-head h2 {
+            font-size: 17px;
+            margin: 0 0 3px;
+        }
+
+        .matrix-head p {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin: 0;
+            max-width: 70ch;
+        }
+
+        .matrix-head .btn {
+            margin-left: auto;
+            flex: 0 0 auto;
+        }
+
+        .matrix-body {
+            overflow: auto;
+            flex: 1;
+        }
+
+        table.matrix {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            min-width: 920px;
+            font-size: 12.5px;
+        }
+
+        .matrix th,
+        .matrix td {
+            padding: 7px 10px;
+            border-bottom: 1px solid var(--line);
+            text-align: center;
+        }
+
+        .matrix thead th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: var(--accent);
+            color: var(--accent-ink);
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: .03em;
+            padding: 10px 8px;
+            white-space: nowrap;
+        }
+
+        .matrix thead th:first-child {
+            text-align: left;
+            left: 0;
+            z-index: 4;
+        }
+
+        .matrix tbody td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background: var(--surface);
+            text-align: left;
+            font-weight: 500;
+            min-width: 230px;
+        }
+
+        .matrix .group-row td {
+            background: var(--surface-2);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            padding: 8px 10px;
+        }
+
+        .matrix input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .matrix .m-hu {
+            display: block;
+            margin-top: 1px;
+            font-size: 10.5px;
+            font-weight: 400;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: .01em;
+        }
+
+        .matrix tbody tr:not(.group-row):hover td {
+            background: var(--accent-soft);
+        }
+
+        .matrix tbody tr:not(.group-row):hover td:first-child {
+            background: var(--accent-soft);
+        }
+
+        .matrix-foot {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 14px 22px;
+            border-top: 1px solid var(--line);
+        }
+
+        .matrix-foot .note {
+            font-size: 12px;
+            color: var(--muted);
+            margin-right: auto;
+        }
+
+        /* Toast de confirmación */
+        .toast {
+            position: fixed;
+            right: 22px;
+            bottom: 92px;
+            z-index: 70;
+            background: var(--ok);
+            color: #fff;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .25);
+        }
+
+        /* Pie de lista: conteo + paginación */
+        .list-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+            font-size: 12.5px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .list-foot .pager {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .pane h3 {
+            font-size: 13px;
+            margin: 0 0 10px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .kv {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px 24px;
+            font-size: 13.5px;
+            margin: 0;
+        }
+
+        .kv dt {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .kv dd {
+            margin: 0;
+            font-variant-numeric: tabular-nums;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+        <header class="topbar">
+            <div class="brand"><b>Backoffice</b><span>Mercantil Panamá · Usuarios digitales</span></div>
+            <div class="operator">
+                <span class="op-role" id="op-role">Super Admin</span>
+                <span>Operador: Francisco V.</span>
+                <span class="op-avatar" aria-hidden="true">FV</span>
+            </div>
+        </header>
+
+        <div class="shell">
+            <!-- ================= MENÚ ================= -->
+            <nav class="sidebar" aria-label="Menú principal">
+                <button type="button" class="nav-item" data-view="v-inicio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 10.5 12 3l9 7.5" />
+                        <path d="M5 9.5V21h14V9.5" />
+                    </svg>
+                    <span class="nav-txt">
+                        <span class="nav-label">Inicio</span>
+                        <span class="nav-hu">3 HUs · Épicas 2 y 10</span>
+                    </span>
+                </button>
+                <button type="button" class="nav-item active" data-view="v-usuarios">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        aria-hidden="true">
+                        <circle cx="10.5" cy="10.5" r="6.5" />
+                        <path d="m20 20-4.8-4.8" />
+                    </svg>
+                    <span class="nav-txt">
+                        <span class="nav-label">Usuarios</span>
+                        <span class="nav-hu">24 HUs · Épicas 1, 3, 4 y 9</span>
+                    </span>
+                </button>
+                <button type="button" class="nav-item" data-view="v-bandejas">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 13h5l2 3h4l2-3h5" />
+                        <path d="M5 6h14l2 7v6H3v-6z" />
+                    </svg>
+                    <span class="nav-txt">
+                        <span class="nav-label">Bandejas</span>
+                        <span class="nav-hu">11 HUs · Épicas 3 y 7</span>
+                    </span>
+                    <span class="badge">12</span>
+                </button>
+                <button type="button" class="nav-item" data-view="v-negocios">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 11v2l11 4V7z" />
+                        <path d="M14 7c3 0 6 2 6 6" />
+                        <path d="M7 13.5V19h3v-4.4" />
+                    </svg>
+                    <span class="nav-txt">
+                        <span class="nav-label">Administración de negocios</span>
+                        <span class="nav-hu">6 HUs · Épica 7</span>
+                    </span>
+                </button>
+                <button type="button" class="nav-item" data-view="v-admin">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3.2" />
+                        <path
+                            d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1" />
+                    </svg>
+                    <span class="nav-txt">
+                        <span class="nav-label">Administración</span>
+                        <span class="nav-hu">8 HUs · Épicas 5, 6 y 8</span>
+                    </span>
+                </button>
+                <p class="sidebar-foot">La visibilidad de secciones, tabs y acciones depende del <strong>rol
+                        activo</strong>.
+                    Probálo con el botón flotante «Ver como rol».</p>
+            </nav>
+
+            <!-- ================= ÁREA DE TRABAJO ================= -->
+            <main class="main">
+
+                <!-- ========== INICIO ========== -->
+                <section class="view" id="v-inicio" aria-label="Inicio">
+                    <div class="greet">
+                        <div>
+                            <h1>Buenos días, Francisco</h1>
+                            <span class="g-date">Miércoles, 15 de julio de 2026 · Ciudad de Panamá</span>
+                        </div>
+                        <span class="pill">Canal digital operativo</span>
+                    </div>
+                    <details class="cobertura">
+                        <summary>HUs que cubre esta sección (3)</summary>
+                        <div class="hu-chips">
+                            <span class="hu-chip"><b>É2</b> BO · HU Home</span>
+                            <span class="hu-chip"><b>É2</b> BO · HU Menú de usuario</span>
+                            <span class="hu-chip"><b>É10</b> BO · HU Dashboard</span>
+                        </div>
+                    </details>
+
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="s-icon orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M3 13h5l2 3h4l2-3h5" />
+                                    <path d="M5 6h14l2 7v6H3v-6z" />
+                                </svg></span>
+                            <span class="s-txt"><span class="s-label">Pendientes en bandejas</span><span
+                                    class="s-value">12</span><span class="s-hint">2 con más de 24 h de
+                                    espera</span></span>
+                        </div>
+                        <div class="stat">
+                            <span class="s-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="9" cy="8" r="3.5" />
+                                    <path d="M3.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5" />
+                                    <circle cx="17" cy="9" r="2.5" />
+                                    <path d="M16 14.7c2.3.3 4 2 4.4 4.8" />
+                                </svg></span>
+                            <span class="s-txt"><span class="s-label">Usuarios gestionados hoy</span><span
+                                    class="s-value">37</span><span class="s-hint">Última acción hace 4 min</span></span>
+                        </div>
+                        <div class="stat">
+                            <span class="s-icon cyan" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6z" />
+                                    <path d="M9.2 12.2l2 2 3.6-4" />
+                                </svg></span>
+                            <span class="s-txt"><span class="s-label">Solicitudes biométricas</span><span
+                                    class="s-value">4</span><span class="s-hint">1 por camino alterno</span></span>
+                        </div>
+                        <div class="stat">
+                            <span class="s-icon green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="8.5" />
+                                    <path d="m8.5 12.5 2.4 2.4 4.6-5.4" />
+                                </svg></span>
+                            <span class="s-txt"><span class="s-label">Estado del canal</span><span class="s-value"
+                                    style="color:var(--ok); font-size:20px">Operativo</span><span class="s-hint">Sin
+                                    mantenimientos
+                                    programados</span></span>
+                        </div>
+                    </div>
+
+                    <div class="inicio-grid">
+                        <div class="panel">
+                            <h2>Bandejas pendientes <span class="pill info">12</span></h2>
+                            <p>Distribución del trabajo entrante por cola.</p>
+                            <div class="bar-row"><span class="b-label">Aprobaciones del Backoffice</span><span
+                                    class="bar-track"><span class="bar-fill" style="width:42%"></span></span><span
+                                    class="b-count">5</span></div>
+                            <div class="bar-row"><span class="b-label">Validación de biometría</span><span
+                                    class="bar-track"><span class="bar-fill" style="width:33%"></span></span><span
+                                    class="b-count">4</span></div>
+                            <div class="bar-row"><span class="b-label">Documentos de actualización</span><span
+                                    class="bar-track"><span class="bar-fill" style="width:25%"></span></span><span
+                                    class="b-count">3</span></div>
+                            <div class="actions" style="margin-top:16px"><button class="btn primary" type="button"
+                                    data-goto="v-bandejas">Ir a bandejas</button></div>
+                        </div>
+                        <div class="panel">
+                            <h2>Accesos rápidos</h2>
+                            <p>Las tareas más frecuentes del operador.</p>
+                            <div class="qa-grid">
+                                <button class="qa" type="button" data-goto="v-usuarios">
+                                    <span class="s-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                            <circle cx="10.5" cy="10.5" r="6.5" />
+                                            <path d="m20 20-4.8-4.8" />
+                                        </svg></span>
+                                    Buscar usuario
+                                </button>
+                                <button class="qa" type="button" data-goto="v-bandejas">
+                                    <span class="s-icon orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M3 13h5l2 3h4l2-3h5" />
+                                            <path d="M5 6h14l2 7v6H3v-6z" />
+                                        </svg></span>
+                                    Bandejas
+                                </button>
+                                <button class="qa" type="button" data-goto="v-negocios">
+                                    <span class="s-icon cyan" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M3 11v2l11 4V7z" />
+                                            <path d="M14 7c3 0 6 2 6 6" />
+                                            <path d="M7 13.5V19h3v-4.4" />
+                                        </svg></span>
+                                    Campañas
+                                </button>
+                                <button class="qa" type="button" data-goto="v-admin">
+                                    <span class="s-icon green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M5 4h14v17l-3-2-2 2-2-2-2 2-2-2-3 2z" />
+                                            <path d="M9 9h6M9 13h4" />
+                                        </svg></span>
+                                    Auditoría
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h2>Actividad reciente del equipo</h2>
+                        <div class="rowlist">
+                            <div class="row"><span class="r-main"><span class="r-title">Desbloqueo de token — José Luis
+                                        Pérez</span><span class="r-sub">Operador F. V. · hoy 10:22</span></span><span
+                                    class="spacer"></span><span class="pill">Completado</span></div>
+                            <div class="row"><span class="r-main"><span class="r-title">Aprobación de límites — María
+                                        Pérez ·
+                                        $25,000.00/día</span><span class="r-sub">Supervisor T. Rojas · hoy
+                                        09:58</span></span><span class="spacer"></span><span
+                                    class="pill">Completado</span></div>
+                            <div class="row"><span class="r-main"><span class="r-title">Campaña «Actualización 2026» —
+                                        44 documentos
+                                        nuevos</span><span class="r-sub">Carga automática · hoy 09:30</span></span><span
+                                    class="spacer"></span><span class="pill info">Informativo</span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== USUARIOS ========== -->
+                <section class="view active" id="v-usuarios" aria-label="Usuarios">
+                    <div class="view-head">
+                        <h1>Usuarios</h1>
+                        <p>Punto único de acceso: buscá cualquier usuario digital (persona o jurídico) y gestioná todo
+                            desde su
+                            ficha 360 — estado, contacto, seguridad, productos y actividad.</p>
+                    </div>
+                    <details class="cobertura">
+                        <summary>HUs que cubre esta sección (24)</summary>
+                        <div class="hu-chips">
+                            <span class="hu-chip"><b>É1</b> Buscador de usuarios personas</span>
+                            <span class="hu-chip"><b>É1</b> Buscador de usuarios jurídicos — Admins y Secundarios</span>
+                            <span class="hu-chip"><b>É1</b> Visualización estructurada (detalle) personas</span>
+                            <span class="hu-chip"><b>É1</b> Visualización jurídico — relación Empresa-Usuarios</span>
+                            <span class="hu-chip"><b>É1</b> Bloqueo de usuario digital</span>
+                            <span class="hu-chip"><b>É1</b> Desbloqueo de usuario digital</span>
+                            <span class="hu-chip"><b>É1</b> Cancelación de usuario digital</span>
+                            <span class="hu-chip"><b>É1</b> Consulta de datos de contacto (persona y jurídico)</span>
+                            <span class="hu-chip"><b>É1</b> Actualización de correo electrónico</span>
+                            <span class="hu-chip"><b>É1</b> Actualización de teléfono celular</span>
+                            <span class="hu-chip"><b>É1</b> Consulta de productos asociados</span>
+                            <span class="hu-chip"><b>É1</b> Consulta y gestión de productos</span>
+                            <span class="hu-chip"><b>É1</b> HU-11 Consulta de límites</span>
+                            <span class="hu-chip"><b>É1</b> HU-12 Modificación de límites</span>
+                            <span class="hu-chip"><b>É3</b> HU-13 Estado de autenticadores (token, preguntas,
+                                OTP)</span>
+                            <span class="hu-chip"><b>É3</b> HU-14 Desbloqueo de autenticadores</span>
+                            <span class="hu-chip"><b>É3</b> HU-15 Reenvío de OTP</span>
+                            <span class="hu-chip"><b>É3</b> BO · Eliminación de token</span>
+                            <span class="hu-chip"><b>É3</b> HU-16 Reseteo de clave</span>
+                            <span class="hu-chip"><b>É3</b> HU-17 Desbloqueo de clave</span>
+                            <span class="hu-chip"><b>É4</b> HU-21 Consulta de transacciones</span>
+                            <span class="hu-chip"><b>É4</b> HU-23 Consulta de actividad</span>
+                            <span class="hu-chip"><b>É4</b> HU-25/26 Pagos programados (consulta, detalle y
+                                eliminación)</span>
+                            <span class="hu-chip"><b>É9</b> Perfil Multiempresa y Usuario Administrador —
+                                Jurídico</span>
+                        </div>
+                    </details>
+
+                    <div class="type-cards" role="radiogroup" aria-label="Tipo de usuario a buscar">
+                        <button type="button" class="type-card active" data-tipo="persona" role="radio"
+                            aria-checked="true">
+                            <span class="tc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="8" r="4" />
+                                    <path d="M4.5 20.5c.7-4 3.8-6 7.5-6s6.8 2 7.5 6" />
+                                </svg></span>
+                            <span class="tc-txt"><b>Persona</b><span>Cédula o pasaporte · banca personas</span></span>
+                            <span class="tc-radio" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" class="type-card" data-tipo="juridico" role="radio" aria-checked="false">
+                            <span class="tc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M4 21V5l8-2v18M12 21h8V9l-8-2" />
+                                    <path d="M7 9h2M7 13h2M15 12h2M15 16h2" />
+                                </svg></span>
+                            <span class="tc-txt"><b>Empresa</b><span>RUC o RIF · administradores y
+                                    secundarios</span></span>
+                            <span class="tc-radio" aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="search-bar" role="search">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <circle cx="10.5" cy="10.5" r="6.5" />
+                            <path d="m20 20-4.8-4.8" />
+                        </svg>
+                        <input type="text" id="search-input" value="8-812-1930" aria-label="Criterio de búsqueda">
+                        <button class="btn primary" type="button" id="btn-buscar">Buscar</button>
+                    </div>
+
+                    <div class="empty-state" id="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                            stroke-linecap="round" aria-hidden="true">
+                            <circle cx="10.5" cy="10.5" r="6.5" />
+                            <path d="m20 20-4.8-4.8" />
+                        </svg>
+                        <p>Seleccioná el tipo de usuario, ingresá el criterio (documento, nombre, correo o teléfono) y
+                            presioná
+                            <strong>Buscar</strong>. Los resultados aparecerán aquí.
+                        </p>
+                    </div>
+
+                    <div id="resultados" hidden>
+                        <p class="results-count">2 coincidencias para «pérez» — confirmá identidad antes de abrir la
+                            ficha</p>
+                        <div class="results">
+                            <button type="button" class="result" data-init="IP" data-name="Inversiones Pérez 2000, S.A."
+                                data-doc="RUC 155612345-2-2021 · Panamá · Empresa · 2 administradores"
+                                data-status="Activo" data-blocked="false">
+                                <span class="avatar" aria-hidden="true">IP</span>
+                                <span class="r-info">
+                                    <span class="name">Inversiones Pérez 2000, S.A.</span>
+                                    <span class="doc">RUC 155612345-2-2021 (Panamá) · admin@inversionesperez.com</span>
+                                </span>
+                                <span class="chip">Empresa</span>
+                                <span class="pill">Activo</span>
+                            </button>
+                            <button type="button" class="result" data-init="LP"
+                                data-name="Logística Pérez &amp; Co, S.A."
+                                data-doc="RUC 8451296-1-458923 · Panamá · Empresa · 1 administrador"
+                                data-status="Bloqueado" data-blocked="true">
+                                <span class="avatar" aria-hidden="true">LP</span>
+                                <span class="r-info">
+                                    <span class="name">Logística Pérez &amp; Co, S.A.</span>
+                                    <span class="doc">RUC 8451296-1-458923 (Panamá) ·
+                                        operaciones@logisticaperez.com</span>
+                                </span>
+                                <span class="chip">Empresa</span>
+                                <span class="pill warn">Bloqueado</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="ficha" hidden>
+                        <button type="button" class="back" id="volver">← Nueva búsqueda</button>
+                        <div class="ficha">
+                            <div class="user-head">
+                                <span class="avatar" id="f-avatar" aria-hidden="true">MP</span>
+                                <div>
+                                    <div class="name" id="f-name">María Pérez</div>
+                                    <div class="doc" id="f-doc">Cédula 8-812-1930 · Panamá · Persona natural</div>
+                                </div>
+                                <span class="status" id="f-status">Activo</span>
+                            </div>
+                            <div class="tabs" role="tablist" aria-label="Ficha 360 del usuario">
+                                <button type="button" role="tab" class="active" data-pane="p-resumen"
+                                    aria-selected="true">Resumen</button>
+                                <button type="button" role="tab" data-pane="p-contacto"
+                                    aria-selected="false">Contacto</button>
+                                <button type="button" role="tab" data-pane="p-seguridad"
+                                    aria-selected="false">Seguridad</button>
+                                <button type="button" role="tab" data-pane="p-productos" aria-selected="false">Productos
+                                    y
+                                    límites</button>
+                                <button type="button" role="tab" data-pane="p-actividad"
+                                    aria-selected="false">Actividad</button>
+                                <button type="button" role="tab" data-pane="p-empresa"
+                                    aria-selected="false">Empresas</button>
+                            </div>
+
+                            <div class="pane active" id="p-resumen" role="tabpanel">
+                                <h3>Acciones rápidas sobre el estado</h3>
+                                <div class="actions" style="margin-bottom:16px">
+                                    <button class="btn primary" type="button">Bloquear</button>
+                                    <button class="btn" type="button">Desbloquear</button>
+                                    <button class="btn" type="button">Cancelar usuario</button>
+                                </div>
+                                <dl class="kv">
+                                    <dt>Estado del usuario</dt>
+                                    <dd>Activo</dd>
+                                    <dt>Último acceso</dt>
+                                    <dd>14/07/2026 · 18:42</dd>
+                                    <dt>Canal</dt>
+                                    <dd>App + Web</dd>
+                                </dl>
+                                <p class="hu-note"><b>Cubre:</b> HU Bloqueo · HU Desbloqueo · HU Cancelación · HU
+                                    Visualización
+                                    estructurada (detalle)</p>
+                            </div>
+
+                            <div class="pane" id="p-contacto" role="tabpanel">
+                                <h3>Datos de contacto — edición inline</h3>
+                                <dl class="kv">
+                                    <dt>Correo</dt>
+                                    <dd>maria.perez@mail.com <button class="btn sm" type="button">Editar</button></dd>
+                                    <dt>Teléfono celular</dt>
+                                    <dd>+507 6800-1122 <button class="btn sm" type="button">Editar</button></dd>
+                                    <dt>País de residencia</dt>
+                                    <dd>Panamá</dd>
+                                </dl>
+                                <p class="hu-note"><b>Cubre:</b> HU Consulta de datos de contacto (persona y jurídico) ·
+                                    HU
+                                    Actualización de correo · HU Actualización de teléfono</p>
+                            </div>
+
+                            <div class="pane" id="p-seguridad" role="tabpanel">
+                                <h3>Autenticadores y credenciales</h3>
+                                <div class="actions" style="margin-bottom:16px">
+                                    <button class="btn primary" type="button">Reenviar OTP</button>
+                                    <button class="btn" type="button">Desbloquear token</button>
+                                    <button class="btn" type="button">Eliminar token</button>
+                                    <button class="btn" type="button">Resetear clave</button>
+                                    <button class="btn" type="button">Desbloquear clave</button>
+                                </div>
+                                <dl class="kv">
+                                    <dt>Token</dt>
+                                    <dd><span class="pill warn">Bloqueado</span></dd>
+                                    <dt>OTP</dt>
+                                    <dd><span class="pill warn">Vencido</span></dd>
+                                    <dt>Biometría</dt>
+                                    <dd><span class="pill">Validada</span></dd>
+                                </dl>
+                                <p class="hu-note"><b>Cubre:</b> HU-13 Estado de autenticadores · HU-14 Desbloqueo ·
+                                    HU-15 Reenvío de
+                                    OTP · BO Eliminación de token · HU-16 Reseteo de clave · HU-17 Desbloqueo de clave
+                                </p>
+                            </div>
+
+                            <div class="pane" id="p-productos" role="tabpanel">
+                                <h3>Productos asociados y límites</h3>
+                                <dl class="kv">
+                                    <dt>Cuenta corriente</dt>
+                                    <dd>····4521 · USD · Activa</dd>
+                                    <dt>Tarjeta de crédito</dt>
+                                    <dd>····8810 · USD · Activa</dd>
+                                    <dt>Límite transferencias</dt>
+                                    <dd>$25,000.00 / día <button class="btn sm" type="button">Modificar</button></dd>
+                                </dl>
+                                <p class="hu-note"><b>Cubre:</b> HU Consulta de productos · HU Consulta y gestión de
+                                    productos · HU-11
+                                    Consulta de límites · HU-12 Modificación de límites</p>
+                            </div>
+
+                            <div class="pane" id="p-actividad" role="tabpanel">
+                                <h3>Transacciones, eventos y pagos programados</h3>
+                                <dl class="kv">
+                                    <dt>14/07 · 18:40</dt>
+                                    <dd>Transferencia a terceros · $1,200.00</dd>
+                                    <dt>14/07 · 18:38</dt>
+                                    <dd>Inicio de sesión · App</dd>
+                                    <dt>Pago programado</dt>
+                                    <dd>ENSA (electricidad) · $86.50 · día 20 de c/mes <button class="btn sm"
+                                            type="button">Eliminar</button></dd>
+                                </dl>
+                                <p class="hu-note"><b>Cubre:</b> HU-21 Consulta de transacciones · HU-23 Consulta de
+                                    actividad · HU-25
+                                    Consulta de pagos programados · HU Detalles de pagos · HU-26 Eliminación de pagos
+                                </p>
+                            </div>
+
+                            <div class="pane" id="p-empresa" role="tabpanel">
+                                <h3>Relación empresa-usuarios (solo jurídicos)</h3>
+                                <p style="color:var(--muted); margin:0 0 10px; font-size:13.5px">En usuarios jurídicos
+                                    este tab muestra
+                                    la relación empresa-usuarios, los administradores y secundarios, y el perfil
+                                    multiempresa.</p>
+                                <p class="hu-note"><b>Cubre:</b> HU Consulta de relación Empresa-Usuarios · BO Gestión
+                                    de Perfil
+                                    Multiempresa (grupos) · BO Configuración del Usuario Administrador — Jurídico</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== BANDEJAS ========== -->
+                <section class="view" id="v-bandejas" aria-label="Bandejas">
+                    <div class="view-head">
+                        <h1>Bandejas</h1>
+                        <p>Todo el trabajo entrante en un solo lugar: lo que otros inician y el operador debe validar,
+                            aprobar o
+                            rechazar.</p>
+                    </div>
+                    <details class="cobertura">
+                        <summary>HUs que cubre esta sección (11)</summary>
+                        <div class="hu-chips">
+                            <span class="hu-chip"><b>É3</b> HU-18 Consulta de bandeja de aprobaciones</span>
+                            <span class="hu-chip"><b>É3</b> HU-19 Aprobación de acciones</span>
+                            <span class="hu-chip"><b>É3</b> HU-20 Rechazo de acciones</span>
+                            <span class="hu-chip"><b>É3</b> BO · Bandeja de validación de biometría</span>
+                            <span class="hu-chip"><b>É3</b> BO · Detalle de solicitud biométrica</span>
+                            <span class="hu-chip"><b>É3</b> BO · Cargar evidencia de descarte</span>
+                            <span class="hu-chip"><b>É3</b> BO · Gestión de solicitudes biométricas</span>
+                            <span class="hu-chip"><b>É3</b> BO · Contingencia camino alterno</span>
+                            <span class="hu-chip"><b>É7</b> HU-30 Bandeja de aprobación de documentos</span>
+                            <span class="hu-chip"><b>É7</b> HU-31 Aprobación individual</span>
+                            <span class="hu-chip"><b>É7</b> HU-32 Aprobación masiva o por lote</span>
+                        </div>
+                    </details>
+                    <div class="tabs" role="tablist" aria-label="Colas de trabajo">
+                        <button type="button" role="tab" class="active" data-pane="b-aprob"
+                            aria-selected="true">Aprobaciones del BO
+                            <span class="tab-count">5</span></button>
+                        <button type="button" role="tab" data-pane="b-biom" aria-selected="false">Validación de
+                            biometría <span class="tab-count">4</span></button>
+                        <button type="button" role="tab" data-pane="b-docs" aria-selected="false">Documentos de
+                            actualización <span class="tab-count">3</span></button>
+                    </div>
+
+                    <div class="pane active" id="b-aprob" role="tabpanel">
+                        <div class="panel">
+                            <div class="toolbar">
+                                <span class="t-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <circle cx="10.5" cy="10.5" r="6.5" />
+                                        <path d="m20 20-4.8-4.8" />
+                                    </svg>Buscar por usuario, operador o tipo de acción…</span>
+                                <span class="chip">Todas</span>
+                                <span class="chip off">Límites</span>
+                                <span class="chip off">Estado</span>
+                                <span class="chip off">Contacto</span>
+                            </div>
+                            <div class="rowlist">
+                                <div class="row"><span class="r-main"><span class="r-title">Modificación de límites —
+                                            María Pérez ·
+                                            $25,000.00 → $40,000.00/día</span><span class="r-sub">Solicitado por
+                                            operador T. Rojas · hace 12
+                                            min</span></span><span class="spacer"></span><button class="btn sm primary"
+                                        type="button">Aprobar</button><button class="btn sm"
+                                        type="button">Rechazar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Cancelación de usuario — L.
+                                            Gómez</span><span class="r-sub">Solicitado por operador A. Díaz · hace 40
+                                            min</span></span><span class="spacer"></span><button class="btn sm primary"
+                                        type="button">Aprobar</button><button class="btn sm"
+                                        type="button">Rechazar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Actualización de correo — R.
+                                            Medina</span><span class="r-sub">Solicitado por operador T. Rojas · hace 1
+                                            h</span></span><span class="spacer"></span><button class="btn sm primary"
+                                        type="button">Aprobar</button><button class="btn sm"
+                                        type="button">Rechazar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Eliminación de token — A.
+                                            Brown</span><span class="r-sub">Solicitado por operador F. V. · hace 2
+                                            h</span></span><span class="spacer"></span><button class="btn sm primary"
+                                        type="button">Aprobar</button><button class="btn sm"
+                                        type="button">Rechazar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Desbloqueo de usuario — C.
+                                            Fuentes</span><span class="r-sub">Solicitado por operador A. Díaz · hace 26
+                                            h</span></span><span class="spacer"></span><span class="pill warn">+24
+                                        h</span><button class="btn sm primary" type="button">Aprobar</button><button
+                                        class="btn sm" type="button">Rechazar</button></div>
+                            </div>
+                            <div class="list-foot">
+                                <span>Mostrando 1–5 de 5 pendientes</span>
+                                <span class="pager"><button class="btn sm" type="button"
+                                        disabled>Anterior</button><button class="btn sm" type="button"
+                                        disabled>Siguiente</button></span>
+                            </div>
+                            <p class="hu-note"><b>Cubre:</b> HU-18 Bandeja de aprobaciones · HU-19 Aprobación · HU-20
+                                Rechazo</p>
+                        </div>
+                    </div>
+
+                    <div class="pane" id="b-biom" role="tabpanel">
+                        <div class="panel">
+                            <div class="toolbar">
+                                <span class="t-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <circle cx="10.5" cy="10.5" r="6.5" />
+                                        <path d="m20 20-4.8-4.8" />
+                                    </svg>Buscar por número de solicitud o usuario…</span>
+                                <span class="chip">Todas</span>
+                                <span class="chip off">Registro facial</span>
+                                <span class="chip off">Camino alterno</span>
+                            </div>
+                            <div class="rowlist">
+                                <div class="row"><span class="r-main"><span class="r-title">Solicitud #8841 — J.
+                                            Castillo</span><span class="r-sub">Registro facial · recibida hoy
+                                            09:12</span></span><span class="spacer"></span><button
+                                        class="btn sm primary" type="button">Revisar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Solicitud #8839 — R.
+                                            Medina</span><span class="r-sub">Contingencia camino alterno · recibida hoy
+                                            08:55</span></span><span class="spacer"></span><button
+                                        class="btn sm primary" type="button">Revisar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Solicitud #8836 — P.
+                                            Chen</span><span class="r-sub">Registro facial · recibida ayer
+                                            17:40</span></span><span class="spacer"></span><button
+                                        class="btn sm primary" type="button">Revisar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Solicitud #8830 — D.
+                                            Ortiz</span><span class="r-sub">Contingencia camino alterno · recibida hace
+                                            26 h</span></span><span class="spacer"></span><span class="pill warn">+24
+                                        h</span><button class="btn sm primary" type="button">Revisar</button></div>
+                            </div>
+                            <div class="list-foot">
+                                <span>Mostrando 1–4 de 4 pendientes</span>
+                                <span class="pager"><button class="btn sm" type="button"
+                                        disabled>Anterior</button><button class="btn sm" type="button"
+                                        disabled>Siguiente</button></span>
+                            </div>
+                            <p class="hu-note"><b>Cubre:</b> BO Bandeja de validación · BO Detalle de solicitud · BO
+                                Cargar evidencia
+                                de descarte · BO Gestión de solicitudes · BO Contingencia camino alterno</p>
+                        </div>
+                    </div>
+
+                    <div class="pane" id="b-docs" role="tabpanel">
+                        <div class="panel">
+                            <div class="toolbar">
+                                <span class="t-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <circle cx="10.5" cy="10.5" r="6.5" />
+                                        <path d="m20 20-4.8-4.8" />
+                                    </svg>Buscar por usuario, documento o campaña…</span>
+                                <span class="chip">Todas las campañas</span>
+                                <span class="chip off">Actualización 2026</span>
+                                <span class="chip off">Empresas Q3</span>
+                            </div>
+                            <div class="rowlist">
+                                <div class="row"><span class="r-main"><span class="r-title">RUC actualizado —
+                                            Inversiones Pérez 2000,
+                                            S.A.</span><span class="r-sub">Campaña «Actualización 2026» · hace 2
+                                            h</span></span><span class="spacer"></span><button class="btn sm primary"
+                                        type="button">Aprobar</button><button class="btn sm"
+                                        type="button">Rechazar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Pasaporte renovado — A.
+                                            Brown</span><span class="r-sub">Campaña «Actualización 2026» · hace 5
+                                            h</span></span><span class="spacer"></span><button class="btn sm primary"
+                                        type="button">Aprobar</button><button class="btn sm"
+                                        type="button">Rechazar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Lote de 14 documentos —
+                                            Campaña «Empresas
+                                            Q3»</span><span class="r-sub">Aprobación masiva
+                                            disponible</span></span><span class="spacer"></span><button
+                                        class="btn sm primary" type="button">Aprobar lote</button></div>
+                            </div>
+                            <div class="list-foot">
+                                <span>Mostrando 1–3 de 3 pendientes</span>
+                                <span class="pager"><button class="btn sm" type="button"
+                                        disabled>Anterior</button><button class="btn sm" type="button"
+                                        disabled>Siguiente</button></span>
+                            </div>
+                            <p class="hu-note"><b>Cubre:</b> HU-30 Bandeja de documentos · HU-31 Aprobación individual ·
+                                HU-32
+                                Aprobación masiva o por lote</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== GESTIÓN DE NEGOCIOS ========== -->
+                <section class="view" id="v-negocios" aria-label="Administración de negocios">
+                    <div class="view-head">
+                        <h1>Administración de negocios</h1>
+                        <p>Procesos que el banco inicia hacia los clientes: campañas de actualización de datos y
+                            desembolso digital.
+                        </p>
+                    </div>
+                    <details class="cobertura">
+                        <summary>HUs que cubre esta sección (6)</summary>
+                        <div class="hu-chips">
+                            <span class="hu-chip"><b>É7</b> HU-27 Actualización de datos — subir campañas</span>
+                            <span class="hu-chip"><b>É7</b> HU-29 Consulta de actualización de datos (pendientes y
+                                actualizados)</span>
+                            <span class="hu-chip"><b>É7</b> HU-33 Desactivación de campañas y documentos</span>
+                            <span class="hu-chip"><b>É7</b> BO · Activar usuario autorizado para desembolso (PCE) —
+                                Jurídico</span>
+                            <span class="hu-chip"><b>É7</b> BO · Consultar contrato/documento de línea de crédito —
+                                Jurídico</span>
+                            <span class="hu-chip"><b>É7</b> BO · Aprobar usuario autorizado para desembolso —
+                                Jurídico</span>
+                        </div>
+                    </details>
+                    <div class="tabs" role="tablist" aria-label="Procesos de negocio">
+                        <button type="button" role="tab" class="active" data-pane="n-campanas"
+                            aria-selected="true">Campañas de
+                            actualización <span class="tab-count">3</span></button>
+                        <button type="button" role="tab" data-pane="n-pce" aria-selected="false">Desembolso Digital
+                            (PCE) <span class="tab-count">2</span></button>
+                    </div>
+
+                    <div class="pane active" id="n-campanas" role="tabpanel">
+                        <div class="panel">
+                            <div class="toolbar">
+                                <span class="t-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <circle cx="10.5" cy="10.5" r="6.5" />
+                                        <path d="m20 20-4.8-4.8" />
+                                    </svg>Buscar campaña…</span>
+                                <span class="chip">Todas</span>
+                                <span class="chip off">Activas</span>
+                                <span class="chip off">Desactivadas</span>
+                                <button class="btn primary" type="button">Nueva campaña</button>
+                            </div>
+                            <div class="rowlist">
+                                <div class="row"><span class="r-main"><span class="r-title">Actualización 2026 —
+                                            Personas</span><span class="r-sub">1,240 pendientes · 3,180
+                                            actualizados</span></span><span class="spacer"></span><span
+                                        class="pill">Activa</span><button class="btn sm"
+                                        type="button">Ver</button><button class="btn sm"
+                                        type="button">Desactivar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Empresas Q3</span><span
+                                            class="r-sub">312
+                                            pendientes · 88 actualizados</span></span><span class="spacer"></span><span
+                                        class="pill">Activa</span><button class="btn sm"
+                                        type="button">Ver</button><button class="btn sm"
+                                        type="button">Desactivar</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Verificación RUC
+                                            2025</span><span class="r-sub">Finalizada el 30/11/2025</span></span><span
+                                        class="spacer"></span><span class="pill warn">Desactivada</span><button
+                                        class="btn sm" type="button">Ver</button></div>
+                            </div>
+                            <div class="list-foot">
+                                <span>Mostrando 1–3 de 3 campañas</span>
+                                <span class="pager"><button class="btn sm" type="button"
+                                        disabled>Anterior</button><button class="btn sm" type="button"
+                                        disabled>Siguiente</button></span>
+                            </div>
+                            <p class="hu-note"><b>Cubre:</b> HU-27 Subir campañas · HU-29 Consulta (pendientes y
+                                actualizados) · HU-33
+                                Desactivación de campañas y documentos</p>
+                        </div>
+                    </div>
+
+                    <div class="pane" id="n-pce" role="tabpanel">
+                        <div class="panel">
+                            <div class="toolbar">
+                                <span class="t-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <circle cx="10.5" cy="10.5" r="6.5" />
+                                        <path d="m20 20-4.8-4.8" />
+                                    </svg>Buscar por empresa, usuario o contrato…</span>
+                                <span class="chip">Todos</span>
+                                <span class="chip off">Pendientes</span>
+                                <span class="chip off">Autorizados</span>
+                            </div>
+                            <div class="rowlist">
+                                <div class="row"><span class="r-main"><span class="r-title">Inversiones Pérez 2000, S.A.
+                                            — C.
+                                            Fuentes</span><span class="r-sub">Contrato LC-2214 · $150,000.00 · pendiente
+                                            de
+                                            aprobación</span></span><span class="spacer"></span><button
+                                        class="btn sm primary" type="button">Aprobar</button><button class="btn sm"
+                                        type="button">Ver contrato</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Distribuidora Andina, S.A. —
+                                            M.
+                                            Salas</span><span class="r-sub">Contrato LC-2189 · $80,000.00 · activo desde
+                                            02/07/2026</span></span><span class="spacer"></span><span
+                                        class="pill">Autorizado</span><button class="btn sm" type="button">Ver
+                                        contrato</button></div>
+                            </div>
+                            <div class="list-foot">
+                                <span>Mostrando 1–2 de 2 usuarios autorizados</span>
+                                <span class="pager"><button class="btn sm" type="button"
+                                        disabled>Anterior</button><button class="btn sm" type="button"
+                                        disabled>Siguiente</button></span>
+                            </div>
+                            <p class="hu-note"><b>Cubre:</b> BO Activar usuario autorizado · BO Consultar
+                                contrato/documento · BO
+                                Aprobar usuario autorizado</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== ADMINISTRACIÓN ========== -->
+                <section class="view" id="v-admin" aria-label="Administración">
+                    <div class="view-head">
+                        <h1>Administración</h1>
+                        <p>Configuración interna del Backoffice: roles, auditoría y parametrización del canal. Visible
+                            solo para
+                            perfiles administradores.</p>
+                    </div>
+                    <details class="cobertura">
+                        <summary>HUs que cubre esta sección (8)</summary>
+                        <div class="hu-chips">
+                            <span class="hu-chip"><b>É5</b> HU-34 Gestión de grupos de usuarios de Backoffice</span>
+                            <span class="hu-chip"><b>É5</b> HU-35 Asignación de menú a grupo de usuarios</span>
+                            <span class="hu-chip"><b>É5</b> HU-36 Asignación de usuarios de Backoffice</span>
+                            <span class="hu-chip"><b>É6</b> HU-39 Registro de acciones de Backoffice</span>
+                            <span class="hu-chip"><b>É6</b> HU-40 Consulta de bitácora de auditoría</span>
+                            <span class="hu-chip"><b>É8</b> HU-37 Activación de mantenimiento global del canal</span>
+                            <span class="hu-chip"><b>É8</b> BO · Configuración de mensaje e imágenes de
+                                mantenimiento</span>
+                            <span class="hu-chip"><b>É8</b> BO · Configuración avanzada del canal digital
+                                (variables)</span>
+                        </div>
+                    </details>
+                    <div class="tabs" role="tablist" aria-label="Áreas de administración">
+                        <button type="button" role="tab" class="active" data-pane="a-roles" aria-selected="true">Roles y
+                            permisos</button>
+                        <button type="button" role="tab" data-pane="a-audit" aria-selected="false">Auditoría y
+                            control</button>
+                        <button type="button" role="tab" data-pane="a-param" aria-selected="false">Parametrización del
+                            canal</button>
+                    </div>
+
+                    <div class="pane active" id="a-roles" role="tabpanel">
+                        <div class="panel">
+                            <div class="toolbar">
+                                <span class="t-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <circle cx="10.5" cy="10.5" r="6.5" />
+                                        <path d="m20 20-4.8-4.8" />
+                                    </svg>Buscar grupo o usuario de Backoffice…</span>
+                                <button class="btn primary" type="button">Nuevo grupo</button>
+                            </div>
+                            <div class="rowlist">
+                                <div class="row"><span class="r-main"><span class="r-title">Operadores N1</span><span
+                                            class="r-sub">18
+                                            usuarios · acceso a Usuarios + Bandejas</span></span><span
+                                        class="spacer"></span><button class="btn sm" type="button">Editar
+                                        menú</button><button class="btn sm" type="button">Usuarios</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Supervisores</span><span
+                                            class="r-sub">6
+                                            usuarios · todo excepto Administración</span></span><span
+                                        class="spacer"></span><button class="btn sm" type="button">Editar
+                                        menú</button><button class="btn sm" type="button">Usuarios</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Administradores</span><span
+                                            class="r-sub">3
+                                            usuarios · acceso completo</span></span><span class="spacer"></span><button
+                                        class="btn sm" type="button">Editar menú</button><button class="btn sm"
+                                        type="button">Usuarios</button></div>
+                            </div>
+                            <div class="list-foot">
+                                <span>Mostrando 1–3 de 3 grupos</span>
+                                <span class="pager"><button class="btn sm" type="button"
+                                        disabled>Anterior</button><button class="btn sm" type="button"
+                                        disabled>Siguiente</button></span>
+                            </div>
+                            <p class="hu-note"><b>Cubre:</b> HU-34 Grupos de usuarios BO · HU-35 Asignación de menú a
+                                grupo · HU-36
+                                Asignación de usuarios BO</p>
+                        </div>
+                    </div>
+
+                    <div class="pane" id="a-audit" role="tabpanel">
+                        <div class="panel">
+                            <div class="toolbar">
+                                <span class="t-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                                        <circle cx="10.5" cy="10.5" r="6.5" />
+                                        <path d="m20 20-4.8-4.8" />
+                                    </svg>Buscar por operador, usuario afectado o tipo de acción…</span>
+                                <span class="chip">Hoy</span>
+                                <span class="chip off">Últimos 7 días</span>
+                                <span class="chip off">Rango personalizado</span>
+                            </div>
+                            <div class="rowlist">
+                                <div class="row"><span class="r-main"><span class="r-title">Desbloqueo de token — José
+                                            Luis
+                                            Pérez</span><span class="r-sub">Operador F. V. · 15/07/2026 10:22 · IP
+                                            10.4.1.18</span></span><span class="spacer"></span><button class="btn sm"
+                                        type="button">Detalle</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Aprobación de límites —
+                                            María Pérez ·
+                                            $40,000.00/día</span><span class="r-sub">Supervisor T. Rojas · 15/07/2026
+                                            09:58 · IP
+                                            10.4.1.22</span></span><span class="spacer"></span><button class="btn sm"
+                                        type="button">Detalle</button></div>
+                                <div class="row"><span class="r-main"><span class="r-title">Rechazo de solicitud
+                                            biométrica #8828 — D.
+                                            Ortiz</span><span class="r-sub">Operador F. V. · 15/07/2026 09:15 · IP
+                                            10.4.1.18</span></span><span class="spacer"></span><button class="btn sm"
+                                        type="button">Detalle</button></div>
+                            </div>
+                            <div class="list-foot">
+                                <span>Mostrando 1–3 de 214 registros de hoy</span>
+                                <span class="pager"><button class="btn sm" type="button"
+                                        disabled>Anterior</button><button class="btn sm"
+                                        type="button">Siguiente</button></span>
+                            </div>
+                            <p class="hu-note"><b>Cubre:</b> HU-39 Registro de acciones · HU-40 Consulta de bitácora de
+                                auditoría</p>
+                        </div>
+                    </div>
+
+                    <div class="pane" id="a-param" role="tabpanel">
+                        <div class="panel">
+                            <h2>Mantenimiento del canal digital</h2>
+                            <p>Activación global, mensajes al cliente y variables de configuración.</p>
+                            <dl class="kv">
+                                <dt>Mantenimiento global</dt>
+                                <dd><span class="pill">Inactivo</span> <button class="btn sm"
+                                        type="button">Activar</button></dd>
+                                <dt>Mensaje de mantenimiento</dt>
+                                <dd>«Estamos mejorando nuestros servicios…» <button class="btn sm" type="button">Editar
+                                        mensaje e
+                                        imágenes</button></dd>
+                                <dt>Variables del canal</dt>
+                                <dd>42 configuradas <button class="btn sm" type="button">Configuración avanzada</button>
+                                </dd>
+                            </dl>
+                            <p class="hu-note"><b>Cubre:</b> HU-37 Mantenimiento global · BO Mensaje e imágenes de
+                                mantenimiento · BO
+                                Configuración avanzada (variables)</p>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="matrix-overlay" id="matrix-overlay" hidden>
+        <div class="matrix-card" role="dialog" aria-modal="true" aria-labelledby="matrix-title">
+            <div class="matrix-head">
+                <div>
+                    <h2 id="matrix-title">Matriz de permisos por rol</h2>
+                    <p>Una fila por HU del Excel, agrupadas por épica. Marcá o desmarcá los checks y presioná
+                        <strong>Guardar
+                            cambios</strong> para aplicarlos al emulador. Las secciones del menú y los tabs se derivan
+                        automáticamente
+                        de las HUs marcadas. Super Admin no aparece porque siempre tiene acceso completo.</p>
+                </div>
+                <button class="btn" type="button" id="matrix-close">Cerrar</button>
+            </div>
+            <div class="matrix-body" id="matrix-body"></div>
+            <div class="matrix-foot">
+                <span class="note">Los cambios solo afectan a este emulador; «Restaurar original» vuelve a la matriz del
+                    Excel.</span>
+                <button class="btn" type="button" id="matrix-restore">Restaurar original</button>
+                <button class="btn" type="button" id="matrix-cancel">Cancelar</button>
+                <button class="btn primary" type="button" id="matrix-save">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+
+    <div class="role-switcher">
+        <div class="role-panel" id="role-panel" hidden>
+            <p class="rp-title">Ver como rol</p>
+            <button type="button" class="rp-opt current" data-role="superadmin"><span class="rp-dot"
+                    aria-hidden="true"></span>Super Admin</button>
+            <button type="button" class="rp-opt" data-role="consulta"><span class="rp-dot"
+                    aria-hidden="true"></span>Consulta</button>
+            <button type="button" class="rp-opt" data-role="op1"><span class="rp-dot" aria-hidden="true"></span>Operador
+                1 ·
+                Operaciones</button>
+            <button type="button" class="rp-opt" data-role="op2"><span class="rp-dot" aria-hidden="true"></span>Operador
+                2 ·
+                Callcenter</button>
+            <button type="button" class="rp-opt" data-role="op3"><span class="rp-dot" aria-hidden="true"></span>Operador
+                3 ·
+                Negocio</button>
+            <button type="button" class="rp-opt" data-role="aprobador"><span class="rp-dot"
+                    aria-hidden="true"></span>Aprobador</button>
+            <button type="button" class="rp-opt" data-role="cumplimiento"><span class="rp-dot"
+                    aria-hidden="true"></span>Cumplimiento</button>
+            <button type="button" class="rp-opt" data-role="fraude"><span class="rp-dot"
+                    aria-hidden="true"></span>Prevención
+                de Fraude</button>
+            <button type="button" class="rp-opt" data-role="seguridad"><span class="rp-dot"
+                    aria-hidden="true"></span>Seguridad</button>
+            <button type="button" class="rp-opt" data-role="tecnologia"><span class="rp-dot"
+                    aria-hidden="true"></span>Tecnología (Canales y Soporte)</button>
+            <div class="rp-divider" role="separator"></div>
+            <button type="button" class="rp-opt rp-matrix" id="open-matrix">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="2" />
+                    <path d="M3 9h18M9 9v11M15 9v11" />
+                </svg>
+                Matriz de permisos…
+            </button>
+        </div>
+        <button type="button" class="fab" id="fab" aria-expanded="false" aria-controls="role-panel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <circle cx="9.5" cy="8" r="3.5" />
+                <path d="M3.5 20c.5-3.5 3-5.5 6-5.5 1.2 0 2.3.3 3.2.9" />
+                <circle cx="17.5" cy="16.5" r="4" />
+                <path d="M17.5 15v1.5l1.2 1" />
+            </svg>
+            <span><span class="fab-kicker">Ver como rol</span><span id="fab-label">Super Admin</span></span>
+        </button>
+    </div>
+
+    <script>
+        // Navegación del menú lateral
+        var navItems = document.querySelectorAll('.nav-item');
+        function activarVista(id) {
+            navItems.forEach(function (b) { b.classList.toggle('active', b.dataset.view === id); });
+            document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('active', v.id === id); });
+        }
+        navItems.forEach(function (btn) {
+            btn.addEventListener('click', function () { activarVista(btn.dataset.view); });
+        });
+        document.querySelectorAll('[data-goto]').forEach(function (btn) {
+            btn.addEventListener('click', function () { activarVista(btn.dataset.goto); });
+        });
+
+        // Flujo Usuarios: tipo → buscar → (ficha directa | lista) → ficha → volver
+        var resultados = document.getElementById('resultados');
+        var ficha = document.getElementById('ficha');
+        var emptyState = document.getElementById('empty-state');
+        var searchInput = document.getElementById('search-input');
+        var volverBtn = document.getElementById('volver');
+
+        var tipoUsuario = 'persona';
+        var fichaOrigen = 'directa'; // 'directa' (persona, 1 resultado) | 'lista' (jurídico)
+        var EJEMPLO_QUERY = { persona: '8-812-1930', juridico: 'pérez' };
+        var PERSONA_UNICA = {
+            init: 'MP', name: 'María Pérez',
+            doc: 'Cédula 8-812-1930 · Panamá · Persona natural',
+            status: 'Activo', blocked: false
+        };
+
+        function setFicha(datos) {
+            document.getElementById('f-avatar').textContent = datos.init;
+            document.getElementById('f-name').textContent = datos.name;
+            document.getElementById('f-doc').textContent = datos.doc;
+            var status = document.getElementById('f-status');
+            status.textContent = datos.status;
+            status.classList.toggle('blocked', datos.blocked === true || datos.blocked === 'true');
+        }
+
+        function resetBusqueda() {
+            resultados.hidden = true;
+            ficha.hidden = true;
+            emptyState.hidden = false;
+        }
+
+        document.querySelectorAll('.type-card').forEach(function (card) {
+            card.addEventListener('click', function () {
+                tipoUsuario = card.dataset.tipo;
+                document.querySelectorAll('.type-card').forEach(function (c) {
+                    c.classList.toggle('active', c === card);
+                    c.setAttribute('aria-checked', c === card ? 'true' : 'false');
+                });
+                searchInput.value = EJEMPLO_QUERY[tipoUsuario];
+                resetBusqueda();
+            });
+        });
+
+        document.getElementById('btn-buscar').addEventListener('click', function () {
+            emptyState.hidden = true;
+            if (tipoUsuario === 'persona') {
+                // Documento exacto → coincidencia única: directo a la ficha
+                setFicha(PERSONA_UNICA);
+                fichaOrigen = 'directa';
+                volverBtn.textContent = '← Nueva búsqueda';
+                resultados.hidden = true;
+                ficha.hidden = false;
+            } else {
+                // Empresa → varias coincidencias: lista primero
+                resultados.hidden = false;
+                ficha.hidden = true;
+            }
+        });
+
+        document.querySelectorAll('.result').forEach(function (row) {
+            row.addEventListener('click', function () {
+                setFicha(row.dataset);
+                fichaOrigen = 'lista';
+                volverBtn.textContent = '← Volver a resultados (2)';
+                resultados.hidden = true;
+                ficha.hidden = false;
+            });
+        });
+
+        volverBtn.addEventListener('click', function () {
+            ficha.hidden = true;
+            if (fichaOrigen === 'lista') resultados.hidden = false;
+            else emptyState.hidden = false;
+        });
+
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') document.getElementById('btn-buscar').click();
+        });
+
+        // Tabs de la ficha 360
+        document.querySelectorAll('.tabs [role="tab"]').forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                var tabs = tab.closest('.tabs');
+                tabs.querySelectorAll('[role="tab"]').forEach(function (t) {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                var cont = tabs.parentElement;
+                cont.querySelectorAll('.pane').forEach(function (p) { p.classList.remove('active'); });
+                cont.querySelector('#' + tab.dataset.pane).classList.add('active');
+            });
+        });
+
+        /* =====================================================================
+           PERMISOS POR ROL — mapeo de la matriz de roles (Excel) del proyecto.
+           Roles: consulta, op1 (Operaciones), op2 (Callcenter), op3 (Negocio),
+           aprobador, cumplimiento, fraude, seguridad, tecnologia, superadmin.
+           ===================================================================== */
+        var ROLE_LABELS = {
+            superadmin: 'Super Admin',
+            consulta: 'Consulta',
+            op1: 'Operador 1 · Operaciones',
+            op2: 'Operador 2 · Callcenter',
+            op3: 'Operador 3 · Negocio',
+            aprobador: 'Aprobador',
+            cumplimiento: 'Cumplimiento',
+            fraude: 'Prevención de Fraude',
+            seguridad: 'Seguridad',
+            tecnologia: 'Tecnología (Canales y Soporte)'
+        };
+
+        /* ============================================================
+           PERMISOS A NIVEL DE HU — transcripción exacta de la matriz
+           del Excel de épicas (roles × historia). Editable en la matriz.
+           ============================================================ */
+        var TODOS = ['consulta', 'op1', 'op2', 'op3', 'aprobador', 'cumplimiento', 'fraude', 'seguridad', 'tecnologia'];
+        var PERMS = {
+            /* Épica 1 — Gestión de usuarios digitales */
+            'hu-buscador-personas': TODOS.slice(),
+            'hu-buscador-juridicos': TODOS.slice(),
+            'hu-vista-personas': TODOS.slice(),
+            'hu-vista-juridico': TODOS.slice(),
+            'hu-bloqueo': ['op2', 'op3', 'fraude', 'seguridad'],
+            'hu-desbloqueo': ['op2', 'op3', 'fraude'],
+            'hu-cancelacion': ['seguridad'],
+            'hu-contacto-consulta': ['consulta', 'op1', 'op2', 'op3', 'aprobador', 'cumplimiento', 'fraude', 'tecnologia'],
+            'hu-act-correo': ['op1'],
+            'hu-act-telefono': ['op1'],
+            'hu-productos-consulta': TODOS.slice(),
+            'hu-productos-gestion': ['op1', 'aprobador'],
+            'hu-11': TODOS.slice(),
+            'hu-12': ['op1'],
+            /* Épica 2 — Home */
+            'hu-home': TODOS.slice(),
+            'hu-menu-usuario': TODOS.slice(),
+            /* Épica 3 — Seguridad y autenticación */
+            'hu-biom-bandeja': ['op2', 'aprobador', 'tecnologia'],
+            'hu-biom-detalle': ['op2', 'aprobador', 'tecnologia'],
+            'hu-biom-evidencia': [],  /* sin roles marcados en el Excel */
+            'hu-biom-gestion': ['op2', 'tecnologia'],
+            'hu-biom-contingencia': ['op2'],
+            'hu-13': ['consulta', 'op2', 'op3', 'aprobador', 'tecnologia'],
+            'hu-14': ['op2', 'op3', 'fraude'],
+            'hu-15': ['op2', 'op3'],
+            'hu-token-eliminar': ['fraude', 'seguridad'],
+            'hu-16': ['op2', 'op3'],
+            'hu-17': ['op2', 'op3'],
+            'hu-18': ['op3', 'aprobador', 'fraude'],
+            'hu-19': ['op2', 'aprobador'],
+            'hu-20': ['aprobador'],
+            /* Épica 4 — Transaccionalidad */
+            'hu-21': ['consulta', 'op2', 'op3', 'aprobador', 'cumplimiento', 'fraude', 'tecnologia'],
+            'hu-23': ['consulta', 'op2', 'op3', 'aprobador', 'cumplimiento', 'fraude', 'tecnologia'],
+            'hu-25': ['consulta', 'op1', 'op2', 'op3', 'aprobador', 'fraude', 'tecnologia'],
+            'hu-26': ['op2', 'op3'],
+            /* Épica 5 — Administración interna (Seguridad) */
+            'hu-34': ['seguridad'],
+            'hu-35': ['seguridad'],
+            'hu-36': ['seguridad'],
+            /* Épica 6 — Auditoría y control */
+            'hu-39': [],  /* sin roles marcados en el Excel */
+            'hu-40': ['fraude', 'seguridad'],
+            /* Épica 7 — Administración de negocios */
+            'hu-pce-activar': ['op1'],
+            'hu-pce-consulta': ['consulta', 'op1', 'op2', 'op3', 'aprobador', 'tecnologia'],
+            'hu-pce-aprobar': ['op1'],
+            'hu-27': ['cumplimiento'],
+            'hu-29': ['cumplimiento'],
+            'hu-30': ['aprobador', 'cumplimiento'],
+            'hu-31': ['aprobador'],
+            'hu-32': ['aprobador'],
+            'hu-33': ['cumplimiento'],
+            /* Épica 8 — Parametrización mínima */
+            'hu-37': ['tecnologia'],
+            'hu-param-mensajes': ['tecnologia'],
+            'hu-param-avanzada': ['seguridad', 'tecnologia'],
+            /* Épica 9 — Perfil multiempresa */
+            'hu-multi-grupos': ['op1', 'op3', 'aprobador', 'tecnologia'],
+            'hu-multi-admin': ['op1', 'op3', 'aprobador'],
+            /* Épica 10 — Dashboard */
+            'hu-dashboard': ['cumplimiento', 'fraude', 'seguridad', 'tecnologia']
+        };
+
+        /* Claves derivadas: secciones del menú y tabs se calculan como la
+           unión de las HUs que contienen — nunca se editan a mano, así no
+           pueden quedar secciones vacías ni permisos inalcanzables. */
+        var DERIVED = {
+            'view-bandejas': ['hu-18', 'hu-19', 'hu-20', 'hu-biom-bandeja', 'hu-biom-detalle', 'hu-biom-evidencia', 'hu-biom-gestion', 'hu-biom-contingencia', 'hu-30', 'hu-31', 'hu-32'],
+            'view-negocios': ['hu-27', 'hu-29', 'hu-33', 'hu-pce-activar', 'hu-pce-consulta', 'hu-pce-aprobar'],
+            'view-admin': ['hu-34', 'hu-35', 'hu-36', 'hu-39', 'hu-40', 'hu-37', 'hu-param-mensajes', 'hu-param-avanzada'],
+            'u-estado-grp': ['hu-bloqueo', 'hu-desbloqueo', 'hu-cancelacion'],
+            'u-tab-contacto': ['hu-contacto-consulta', 'hu-act-correo', 'hu-act-telefono'],
+            'u-tab-seguridad': ['hu-13', 'hu-14', 'hu-15', 'hu-token-eliminar', 'hu-16', 'hu-17'],
+            'u-tab-actividad': ['hu-21', 'hu-23', 'hu-25', 'hu-26'],
+            'u-tab-empresa': ['hu-multi-grupos', 'hu-multi-admin'],
+            'b-tab-aprob': ['hu-18', 'hu-19', 'hu-20'],
+            'b-tab-biom': ['hu-biom-bandeja', 'hu-biom-detalle', 'hu-biom-evidencia', 'hu-biom-gestion', 'hu-biom-contingencia'],
+            'b-tab-docs': ['hu-30', 'hu-31', 'hu-32'],
+            'b-docs-act': ['hu-31', 'hu-32'],
+            'n-tab-campanas': ['hu-27', 'hu-29', 'hu-33'],
+            'n-tab-pce': ['hu-pce-activar', 'hu-pce-consulta', 'hu-pce-aprobar'],
+            'a-tab-roles': ['hu-34', 'hu-35', 'hu-36'],
+            'a-tab-audit': ['hu-39', 'hu-40'],
+            'a-tab-param': ['hu-37', 'hu-param-mensajes', 'hu-param-avanzada']
+        };
+
+        function effectivePerms() {
+            var eff = {};
+            Object.keys(PERMS).forEach(function (k) { eff[k] = PERMS[k]; });
+            Object.keys(DERIVED).forEach(function (dk) {
+                var set = {};
+                DERIVED[dk].forEach(function (src) {
+                    (PERMS[src] || []).forEach(function (r) { set[r] = true; });
+                });
+                eff[dk] = Object.keys(set);
+            });
+            return eff;
+        }
+
+        /* Qué elementos del DOM gobierna cada permiso (HU o clave derivada) */
+        var PERM_BINDINGS = [
+            /* Menú y accesos (derivados) */
+            ['.nav-item[data-view="v-bandejas"]', 'view-bandejas'],
+            ['.nav-item[data-view="v-negocios"]', 'view-negocios'],
+            ['.nav-item[data-view="v-admin"]', 'view-admin'],
+            ['[data-goto="v-bandejas"]', 'view-bandejas'],
+            ['[data-goto="v-negocios"]', 'view-negocios'],
+            ['[data-goto="v-admin"]', 'view-admin'],
+            /* Inicio: indicadores = BO · HU Dashboard (É10) */
+            ['.stats', 'hu-dashboard'],
+            ['.inicio-grid > .panel:nth-child(1)', 'hu-dashboard'],
+            ['#v-inicio > .panel', 'hu-dashboard'],
+            /* Usuarios: buscadores */
+            ['.type-card[data-tipo="persona"]', 'hu-buscador-personas'],
+            ['.type-card[data-tipo="juridico"]', 'hu-buscador-juridicos'],
+            /* Ficha 360 — estado */
+            ['#p-resumen h3, #p-resumen .actions', 'u-estado-grp'],
+            ['#p-resumen .actions .btn:nth-child(1)', 'hu-bloqueo'],
+            ['#p-resumen .actions .btn:nth-child(2)', 'hu-desbloqueo'],
+            ['#p-resumen .actions .btn:nth-child(3)', 'hu-cancelacion'],
+            /* Ficha 360 — contacto */
+            ['[data-pane="p-contacto"], #p-contacto', 'u-tab-contacto'],
+            ['#p-contacto .kv dd:nth-of-type(1) .btn', 'hu-act-correo'],
+            ['#p-contacto .kv dd:nth-of-type(2) .btn', 'hu-act-telefono'],
+            /* Ficha 360 — seguridad */
+            ['[data-pane="p-seguridad"], #p-seguridad', 'u-tab-seguridad'],
+            ['#p-seguridad .actions .btn:nth-child(1)', 'hu-15'],
+            ['#p-seguridad .actions .btn:nth-child(2)', 'hu-14'],
+            ['#p-seguridad .actions .btn:nth-child(3)', 'hu-token-eliminar'],
+            ['#p-seguridad .actions .btn:nth-child(4)', 'hu-16'],
+            ['#p-seguridad .actions .btn:nth-child(5)', 'hu-17'],
+            /* Ficha 360 — productos y actividad */
+            ['#p-productos .btn', 'hu-12'],
+            ['[data-pane="p-actividad"], #p-actividad', 'u-tab-actividad'],
+            ['#p-actividad .btn', 'hu-26'],
+            ['[data-pane="p-empresa"], #p-empresa', 'u-tab-empresa'],
+            /* Bandejas */
+            ['[data-pane="b-aprob"], #b-aprob', 'b-tab-aprob'],
+            ['#b-aprob .row .btn.primary', 'hu-19'],
+            ['#b-aprob .row .btn:not(.primary)', 'hu-20'],
+            ['[data-pane="b-biom"], #b-biom', 'b-tab-biom'],
+            ['#b-biom .row .btn', 'hu-biom-detalle'],
+            ['[data-pane="b-docs"], #b-docs', 'b-tab-docs'],
+            ['#b-docs .row .btn', 'b-docs-act'],
+            /* Administración de negocios */
+            ['[data-pane="n-campanas"], #n-campanas', 'n-tab-campanas'],
+            ['#n-campanas .toolbar .btn.primary', 'hu-27'],
+            ['#n-campanas .row .btn + .btn', 'hu-33'],
+            ['[data-pane="n-pce"], #n-pce', 'n-tab-pce'],
+            ['#n-pce .row .btn.primary', 'hu-pce-aprobar'],
+            /* Administración */
+            ['[data-pane="a-roles"], #a-roles', 'a-tab-roles'],
+            ['[data-pane="a-audit"], #a-audit', 'a-tab-audit'],
+            ['[data-pane="a-param"], #a-param', 'a-tab-param'],
+            ['#a-param .kv dd:nth-of-type(1) .btn', 'hu-37'],
+            ['#a-param .kv dd:nth-of-type(2) .btn', 'hu-param-mensajes'],
+            ['#a-param .kv dd:nth-of-type(3) .btn', 'hu-param-avanzada']
+        ];
+
+        var currentRole = 'superadmin';
+        var DEFAULT_PERMS = JSON.parse(JSON.stringify(PERMS));
+
+        function applyRole(role) {
+            currentRole = role;
+            var eff = effectivePerms();
+            PERM_BINDINGS.forEach(function (binding) {
+                var allowed = role === 'superadmin' || (eff[binding[1]] || []).indexOf(role) > -1;
+                document.querySelectorAll(binding[0]).forEach(function (el) { el.hidden = !allowed; });
+            });
+            document.getElementById('fab-label').textContent = ROLE_LABELS[role];
+            document.getElementById('op-role').textContent = ROLE_LABELS[role];
+
+            // Si la vista activa quedó oculta, ir a la primera visible (Inicio siempre lo está)
+            var activeNav = document.querySelector('.nav-item.active');
+            if (activeNav && activeNav.hidden) {
+                var firstNav = Array.prototype.find.call(document.querySelectorAll('.nav-item'), function (b) { return !b.hidden; });
+                if (firstNav) activarVista(firstNav.dataset.view);
+            }
+            // Si el tab activo de algún tablist quedó oculto, activar el primero visible
+            document.querySelectorAll('.tabs').forEach(function (tabs) {
+                var act = tabs.querySelector('[role="tab"].active');
+                if (act && act.hidden) {
+                    var first = Array.prototype.find.call(tabs.querySelectorAll('[role="tab"]'), function (t) { return !t.hidden; });
+                    if (first) first.click();
+                }
+            });
+        }
+
+        // Botón flotante
+        var fab = document.getElementById('fab');
+        var rolePanel = document.getElementById('role-panel');
+        fab.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var abrir = rolePanel.hasAttribute('hidden');
+            if (abrir) { rolePanel.removeAttribute('hidden'); fab.setAttribute('aria-expanded', 'true'); }
+            else { rolePanel.setAttribute('hidden', ''); fab.setAttribute('aria-expanded', 'false'); }
+        });
+        document.addEventListener('click', function (e) {
+            if (!rolePanel.hasAttribute('hidden') && !rolePanel.contains(e.target)) {
+                rolePanel.setAttribute('hidden', '');
+                fab.setAttribute('aria-expanded', 'false');
+            }
+        });
+        document.querySelectorAll('.rp-opt').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.rp-opt').forEach(function (b) { b.classList.toggle('current', b === btn); });
+                applyRole(btn.dataset.role);
+                rolePanel.setAttribute('hidden', '');
+                fab.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        /* =====================================================================
+           MATRIZ DE PERMISOS — pantalla editable con vista completa rol × función
+           ===================================================================== */
+        var MATRIX_ROLES = ['consulta', 'op1', 'op2', 'op3', 'aprobador', 'cumplimiento', 'fraude', 'seguridad', 'tecnologia'];
+        var MATRIX_ROLE_SHORT = {
+            consulta: 'Consulta', op1: 'Op. 1 Oper.', op2: 'Op. 2 CC', op3: 'Op. 3 Neg.',
+            aprobador: 'Aprobador', cumplimiento: 'Cumplim.', fraude: 'Fraude', seguridad: 'Seguridad', tecnologia: 'Tecnología'
+        };
+        /* Cada fila: [clave de permiso, funcionalidad, HU del Excel]
+           Una fila por HU de la matriz origen, agrupadas por épica.
+           Las secciones de menú y los tabs NO aparecen: se derivan solos. */
+        var MATRIX_GROUPS = [
+            {
+                name: 'Épica 1 · Gestión de usuarios digitales', rows: [
+                    ['hu-buscador-personas', 'Búsqueda de personas', 'BO · HU Buscador de usuarios personas'],
+                    ['hu-buscador-juridicos', 'Búsqueda de empresas', 'BO · HU Buscador de Usuarios Jurídicos — Admins y Secundarios'],
+                    ['hu-vista-personas', 'Ficha estructurada — personas', 'BO · HU Visualización estructurada (detalle) personas'],
+                    ['hu-vista-juridico', 'Ficha estructurada — jurídico', 'BO · HU Visualización jurídico — relación Empresa-Usuarios'],
+                    ['hu-bloqueo', 'Bloquear usuario', 'BO · HU Bloqueo de usuario digital'],
+                    ['hu-desbloqueo', 'Desbloquear usuario', 'BO · HU Desbloqueo de usuario digital'],
+                    ['hu-cancelacion', 'Cancelar usuario', 'BO · HU Cancelación de usuario digital'],
+                    ['hu-contacto-consulta', 'Ver datos de contacto', 'BO · HU Consulta de datos de contacto (persona y jurídico)'],
+                    ['hu-act-correo', 'Actualizar correo electrónico', 'BO · HU Actualización de correo electrónico'],
+                    ['hu-act-telefono', 'Actualizar teléfono celular', 'BO · HU Actualización de teléfono celular'],
+                    ['hu-productos-consulta', 'Ver productos asociados', 'BO · HU Consulta de productos asociados'],
+                    ['hu-productos-gestion', 'Gestionar productos', 'BO · HU Consulta y gestión de productos'],
+                    ['hu-11', 'Ver límites por usuario', 'HU-11'],
+                    ['hu-12', 'Modificar límites por usuario', 'HU-12']
+                ]
+            },
+            {
+                name: 'Épica 2 · Home', rows: [
+                    ['hu-home', 'Home', 'BO · HU Home'],
+                    ['hu-menu-usuario', 'Menú de usuario', 'BO · HU Menú de usuario']
+                ]
+            },
+            {
+                name: 'Épica 3 · Seguridad y autenticación', rows: [
+                    ['hu-biom-bandeja', 'Bandeja de validación de biometría', 'BO · HU Bandeja de validación de biometría'],
+                    ['hu-biom-detalle', 'Detalle de solicitud biométrica', 'BO · HU Detalle de solicitud biométrica'],
+                    ['hu-biom-evidencia', 'Cargar evidencia de descarte', 'BO · HU Cargar evidencia de descarte — ⚠ sin roles en el Excel'],
+                    ['hu-biom-gestion', 'Gestión de solicitudes biométricas', 'BO · HU Gestión de solicitudes (SIGE + Release 1)'],
+                    ['hu-biom-contingencia', 'Contingencia camino alterno', 'BO · HU Contingencia (SIGE + Release 1)'],
+                    ['hu-13', 'Ver estado de autenticadores', 'HU-13'],
+                    ['hu-14', 'Desbloquear autenticadores (token)', 'HU-14'],
+                    ['hu-15', 'Reenviar OTP', 'HU-15'],
+                    ['hu-token-eliminar', 'Eliminar token', 'BO · HU Eliminación de token'],
+                    ['hu-16', 'Resetear clave de usuario', 'HU-16'],
+                    ['hu-17', 'Desbloquear clave de usuario', 'HU-17'],
+                    ['hu-18', 'Ver bandeja de aprobaciones', 'HU-18'],
+                    ['hu-19', 'Aprobar acciones', 'HU-19'],
+                    ['hu-20', 'Rechazar acciones', 'HU-20']
+                ]
+            },
+            {
+                name: 'Épica 4 · Transaccionalidad', rows: [
+                    ['hu-21', 'Ver transacciones del usuario', 'HU-21'],
+                    ['hu-23', 'Ver actividad del usuario', 'HU-23'],
+                    ['hu-25', 'Ver pagos programados y su detalle', 'HU-25 + HU Detalles de Pagos Programados'],
+                    ['hu-26', 'Eliminar pagos programados', 'HU-26']
+                ]
+            },
+            {
+                name: 'Épica 5 · Administración interna — Seguridad', rows: [
+                    ['hu-34', 'Gestión de grupos de usuarios BO', 'HU-34'],
+                    ['hu-35', 'Asignación de menú a grupo', 'HU-35'],
+                    ['hu-36', 'Asignación de usuarios de Backoffice', 'HU-36']
+                ]
+            },
+            {
+                name: 'Épica 6 · Auditoría y control', rows: [
+                    ['hu-39', 'Registro de acciones de Backoffice', 'HU-39 — ⚠ sin roles en el Excel'],
+                    ['hu-40', 'Consulta de bitácora de auditoría', 'HU-40']
+                ]
+            },
+            {
+                name: 'Épica 7 · Administración de negocios', rows: [
+                    ['hu-pce-activar', 'Activar usuario autorizado PCE', 'BO · HU Activar usuario autorizado — Jurídico'],
+                    ['hu-pce-consulta', 'Consultar contrato/documento PCE', 'BO · HU Consultar contrato/documento — Jurídico'],
+                    ['hu-pce-aprobar', 'Aprobar usuario autorizado PCE', 'BO · HU Aprobar usuario autorizado — Jurídico'],
+                    ['hu-27', 'Subir campañas de actualización', 'HU-27'],
+                    ['hu-29', 'Consultar actualización de datos', 'HU-29'],
+                    ['hu-30', 'Ver bandeja de documentos', 'HU-30'],
+                    ['hu-31', 'Aprobación individual de documentos', 'HU-31'],
+                    ['hu-32', 'Aprobación masiva o por lote', 'HU-32'],
+                    ['hu-33', 'Desactivar campañas y documentos', 'HU-33']
+                ]
+            },
+            {
+                name: 'Épica 8 · Parametrización mínima (Operación)', rows: [
+                    ['hu-37', 'Activar mantenimiento global del canal', 'HU-37'],
+                    ['hu-param-mensajes', 'Configurar mensaje e imágenes de mantenimiento', 'BO · HU Configuración de mensaje e imágenes'],
+                    ['hu-param-avanzada', 'Configuración avanzada del canal (variables)', 'BO · HU Configuración avanzada del canal digital']
+                ]
+            },
+            {
+                name: 'Épica 9 · Perfil Multiempresa', rows: [
+                    ['hu-multi-grupos', 'Gestión de perfil multiempresa (grupos)', 'BO · HU Gestión de Perfil Multiempresa — Jurídico'],
+                    ['hu-multi-admin', 'Configuración del usuario administrador', 'BO · HU Config. Usuario Administrador (MVP + Release 1)']
+                ]
+            },
+            {
+                name: 'Épica 10 · Dashboard', rows: [
+                    ['hu-dashboard', 'Dashboard (indicadores del Inicio)', 'BO · HU Dashboard']
+                ]
+            }
+        ];
+
+        function renderMatrix(perms) {
+            var html = '<table class="matrix"><thead><tr><th>Funcionalidad</th>';
+            MATRIX_ROLES.forEach(function (r) { html += '<th>' + MATRIX_ROLE_SHORT[r] + '</th>'; });
+            html += '</tr></thead><tbody>';
+            MATRIX_GROUPS.forEach(function (g) {
+                html += '<tr class="group-row"><td>' + g.name + '</td><td colspan="' + MATRIX_ROLES.length + '"></td></tr>';
+                g.rows.forEach(function (row) {
+                    html += '<tr><td>' + row[1] + '<span class="m-hu">' + row[2] + '</span></td>';
+                    MATRIX_ROLES.forEach(function (r) {
+                        var checked = (perms[row[0]] || []).indexOf(r) > -1 ? ' checked' : '';
+                        html += '<td><input type="checkbox" data-key="' + row[0] + '" data-role="' + r + '"' + checked +
+                            ' aria-label="' + row[1] + ' — ' + ROLE_LABELS[r] + '"></td>';
+                    });
+                    html += '</tr>';
+                });
+            });
+            html += '</tbody></table>';
+            document.getElementById('matrix-body').innerHTML = html;
+        }
+
+        function toast(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.hidden = false;
+            clearTimeout(t._timer);
+            t._timer = setTimeout(function () { t.hidden = true; }, 2600);
+        }
+
+        var matrixOverlay = document.getElementById('matrix-overlay');
+        document.getElementById('open-matrix').addEventListener('click', function () {
+            rolePanel.setAttribute('hidden', '');
+            fab.setAttribute('aria-expanded', 'false');
+            renderMatrix(PERMS);
+            matrixOverlay.hidden = false;
+        });
+        document.getElementById('matrix-close').addEventListener('click', function () { matrixOverlay.hidden = true; });
+        document.getElementById('matrix-cancel').addEventListener('click', function () { matrixOverlay.hidden = true; });
+        document.getElementById('matrix-restore').addEventListener('click', function () {
+            renderMatrix(DEFAULT_PERMS);
+            toast('Checks restaurados a la matriz original — guardá para aplicar');
+        });
+        matrixOverlay.addEventListener('click', function (e) {
+            if (e.target === matrixOverlay) matrixOverlay.hidden = true;
+        });
+
+        document.getElementById('matrix-save').addEventListener('click', function () {
+            var nuevo = {};
+            document.querySelectorAll('#matrix-body input[type="checkbox"]').forEach(function (cb) {
+                if (!nuevo[cb.dataset.key]) nuevo[cb.dataset.key] = [];
+                if (cb.checked) nuevo[cb.dataset.key].push(cb.dataset.role);
+            });
+            // Secciones, tabs y grupos se recalculan solos vía DERIVED en applyRole
+            PERMS = nuevo;
+            applyRole(currentRole);
+            matrixOverlay.hidden = true;
+            toast('Permisos guardados y aplicados al emulador');
+        });
+
+        applyRole('superadmin');
+    </script>
+</body>
+
+</html>
